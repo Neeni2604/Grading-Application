@@ -1,14 +1,23 @@
 <!doctype html>
 <meta charset="utf-8">
-<link rel=icon href="/static/favicon.ico"/>
-<title>Assignment 1 (HTML) - CS 3550</title>
-
-<nav>
-    <strong>CS 3550</strong>
-    <a href="assignments.html">Assignments</a>
-    <a href="profile.html">Profile</a>
-</nav>
+<link rel=icon href="../static/favicon.ico"/>
+<title>Login</title>
 
 <header>
-    
+    <strong>CS 3550</strong>
+    <ul>
+        <li><a href="index.html">Assignments</a></li>
+        <li><a href="profile.html">Profile</a></li>
+    </ul>
 </header>
+
+<main>
+    <h1>Log in</h1>
+    <form>
+        <label for="username">Username</label>
+        <input type="text" name="username" id="username" autofocus>
+
+        <label for="password">Password</label>
+        <input type="text" name="password" id="password">
+    </form>
+</main>

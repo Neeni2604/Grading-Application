@@ -1,14 +1,41 @@
 <!doctype html>
 <meta charset="utf-8">
-<link rel=icon href="/static/favicon.ico"/>
-<title>Assignment 1 (HTML) - CS 3550</title>
-
-<nav>
-    <strong>CS 3550</strong>
-    <a href="assignments.html">Assignments</a>
-    <a href="profile.html">Profile</a>
-</nav>
+<link rel=icon href="../static/favicon.ico"/>
+<title>Submissions</title>
 
 <header>
-    
+    <strong>CS 3550</strong>
+    <ul>
+        <li><a href="index.html">Assignments</a></li>
+        <li><a href="profile.html">Profile</a></li>
+    </ul>
 </header>
+
+<main>
+    <h1>Homework 1 (HTML)</h1>
+    <p>All grades out of 100</p>
+    <table>
+        <thead>
+            <tr>
+                <th><strong>Student</strong></th>
+                <th><strong>Submission</strong></th>
+                <th><strong>Grade</strong></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><label for="s1">s1</label></td>
+                <td><a href="#">Submission</a></td>
+                <td><input type="number" id="s1"></td>
+            </tr>
+            <tr>
+                <td><label for="s2">s2</label></td>
+                <td><a href="#">Submission</a></td>
+                <td><input type="number" id="s2"></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <input type="submit"> 
+    <a href="assignment.html">Back to assignment</a>
+</main>
