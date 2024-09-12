@@ -1,7 +1,7 @@
 <!doctype html>
 <meta charset="utf-8">
 <link rel=icon href="/static/favicon.ico"/>
-<link rel="stylesheet" href="/static/main.css">
+<link rel="stylesheet" href="../static/main.css">
 <title>Homework 1 (HTML)</title>
 
 <header>
@@ -13,17 +13,23 @@
 </header>
 
 <main>
-    <section>
+    <section class="page_heading">
         <h1>Homework 1 (HTML)</h1>
         <p>Due September 08, total of 100 points</p>
     </section>
 
-    <aside>
-        <p>Currently 2/3 submisions</p>
-        <p>One submission assigned to you <a href="submissions.html">Grade</a></p>
+    <aside class="action_card">
+        <div>
+            <p>Currently 2/3 submisions</p>
+        </div>
+        
+        <div>
+            <p>One submission assigned to you</p>
+            <a href="submissions.html">Grade</a>
+        </div>
     </aside>
     
-    <h2>Description</h2>
+    <h2 id="assignment_description_header">Description</h2>
     <p>
         In this assignment, you will set up a web server serving HTML web pages for
         the grading application:

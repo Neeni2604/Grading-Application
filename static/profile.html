@@ -1,7 +1,7 @@
 <!doctype html>
 <meta charset="utf-8">
 <link rel=icon href="/static/favicon.ico"/>
-<link rel="stylesheet" href="/static/main.css">
+<link rel="stylesheet" href="../static/main.css">
 <title>Profile</title>
 
 <header>
@@ -13,49 +13,52 @@
 </header>
 
 <main>
-    <section>
+    <section class="page_heading">
         <h1>Your Grades</h1>
     </section>
     
-    <aside>
-        <p>Currently logged in as ta1. <a href="login.html" role="button">Log Out</a></p>
+    <aside class="action_card">
+        <div>
+            <p>Currently logged in as ta1. </p>
+            <a href="login.html" role="button">Log Out</a>
+        </div>
     </aside>
     
     <table>
         <thead>
             <tr>
                 <th>Assignment</th>
-                <th>Graded</th>
+                <th class="number_column">Graded</th>
             </tr>
         </thead>
         <tbody>
             <tr>
                 <td><a href="assignment.html">Github Username</a></td>
-                <td>2/3</td>
+                <td class="number_column">2/3</td>
             </tr>
             <tr>
                 <td><a href="assignment.html">Homework 1 (HTML)</a></td>
-                <td>1/3</td>
+                <td class="number_column">1/3</td>
             </tr>
             <tr>
                 <td><a href="assignment.html">Homework 2 (CSS)</a></td>
-                <td>0/1</td>
+                <td class="number_column">0/1</td>
             </tr>
             <tr>
                 <td><a href="assignment.html">Homework 3 (Backend)</a></td>
-                <td>0/0</td>
+                <td class="number_column">0/0</td>
             </tr>
             <tr>
                 <td><a href="assignment.html">Homework 4 (Deploy)</a></td>
-                <td>0/0</td>
+                <td class="number_column">0/0</td>
             </tr>
             <tr>
                 <td><a href="assignment.html">Homework 5 (Permissions)</a></td>
-                <td>0/0</td>
+                <td class="number_column">0/0</td>
             </tr>
             <tr>
                 <td><a href="assignment.html">Homework 6 (JS)</a></td>
-                <td>0/0</td>
+                <td class="number_column">0/0</td>
             </tr>
         </tbody>
     </table>

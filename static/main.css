@@ -1,1 +1,142 @@
-* { color: yellow; }
+/*-------------------------- Phase 2 --------------------------------*/
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,400;0,700;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&display=swap');
+
+body {
+    font-family: "IBM Plex Sans", sans-serif;
+    line-height: 1.25;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+code {
+    font-family: "IBM Plex Mono", sans-serif;
+}
+
+main table {
+    line-height: 1.5;
+    width: 100%;                            /* Phase 3*/
+    text-align: left;                       /* Phase 3*/
+    margin: 1rem 0rem;                      /* Phase 4*/
+}
+
+header {
+    font-size: 125%;
+    background-color: grey;               /* Phase 4*/
+    box-shadow: 0px 0px 5px grey;         /* Phase 4 */
+    padding: 0.5rem 1rem;                   /* Phase 4 */
+    display: flex;                          /* Phase 5 */
+    flex-direction: row;                    /* Phase 5 */
+    justify-content: left ;                 /* Phase 5 */
+    width: 100%;
+}
+
+header h1{
+    font-size: inherit;
+    font-weight: bold;
+    margin: 0;
+    margin-left: 1rem;
+}
+
+header a {
+    font-size: inherit;
+    color: darkgrey;
+    text-decoration: none;                  /* Phase 3 */
+}
+
+.page_heading h1 {
+    font-size: 150%;
+    margin-top: 3rem;                       /* Phase 4*/
+    margin-bottom: 0;                       /* */
+    border-bottom: 1px solid lightgray;   /* Phase 4*/
+}
+
+#assignment_description_header {
+    font-size: inherit;
+    margin: 1rem 0rem;                      /* Phase 4*/
+}
+
+#login_form {
+    font-size: 125%;
+    display: flex;                          /* Phase 3 */
+    flex-direction: column;                 /* Phase 3 */
+    gap: 1rem;                              /* Phase 3 */
+}
+
+
+/*-------------------------- Phase 3 --------------------------------*/
+header a:hover {
+    text-decoration: underline;
+}
+
+.number_column {
+    text-align: right;
+}
+
+#login_form input {
+    width: 50%;
+    font-size: inherit;
+}
+
+.login_form_input {
+    display: flex;
+    justify-content: space-between;
+}
+
+#login_form_submit_button {
+    display: flex;
+    justify-content: center;
+}
+
+
+/*-------------------------- Phase 4 --------------------------------*/
+.action_card {
+    border-color: #204a87;
+    border-style: solid;
+    background-color: #b1c3de;
+    border-width: 2px;
+    display: flex;                              /* Phase 5*/
+    flex-direction: column;                     /* Phase 5*/
+    padding: 1rem;                              /* Phase 5*/
+    margin: 1rem;                               /* Phase 5*/
+    gap: 1rem;                                  /* Phase 5*/
+}
+
+.action_card div {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+main {
+    margin: 0rem 1rem;
+    width: 100%;
+    max-width: 50rem;
+}
+
+.page_heading {
+    margin-bottom: 1rem;
+}
+
+
+/*-------------------------- Phase 5 --------------------------------*/
+header ul {
+    margin: 0px;
+    list-style: none;
+    display: flex;
+    flex-grow: 1;
+    justify-content: space-between;
+    padding-left: 1rem;
+}
+
+
+/*------------------------------ Extra ------------------------------*/
+.page_heading p {
+    margin-top: 0px;
+}
+
+.action_card p {
+    margin: 0px;
+}

@@ -1,7 +1,7 @@
 <!doctype html>
 <meta charset="utf-8">
 <link rel=icon href="/static/favicon.ico"/>
-<link rel="stylesheet" href="/static/main.css">
+<link rel="stylesheet" href="../static/main.css">
 <title>Login</title>
 
 <header>
@@ -13,17 +13,23 @@
 </header>
 
 <main>
-    <section>
+    <section class="page_heading">
         <h1>Log in</h1>
     </section>
     
-    <form>
-        <label for="username">Username</label>
-        <input type="text" name="username" id="username" autofocus>
+    <form id="login_form">
+        <div class="login_form_input">
+            <label for="username">Username</label>
+            <input type="text" id="username" autofocus>
+        </div>
 
-        <label for="password">Password</label>
-        <input type="password" name="password" id="password">
-
-        <input type="submit" value="Login">
+        <div class="login_form_input">
+            <label for="password">Password</label>
+            <input type="password" id="password">
+        </div>
+        
+        <div id="login_form_submit_button">
+            <input type="submit" value="Login">
+        </div>
     </form>
 </main>
