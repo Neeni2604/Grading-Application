@@ -25,8 +25,8 @@ main table {
 
 header {
     font-size: 125%;
-    background-color: grey;               /* Phase 4*/
-    box-shadow: 0px 0px 5px grey;         /* Phase 4 */
+    background-color: #ddd;               /* Phase 4*/
+    box-shadow: 0px 0px 5px gray;         /* Phase 4 */
     padding: 0.5rem 1rem;                   /* Phase 4 */
     display: flex;                          /* Phase 5 */
     flex-direction: row;                    /* Phase 5 */
@@ -43,14 +43,14 @@ header h1{
 
 header a {
     font-size: inherit;
-    color: darkgrey;
+    color: #444;
     text-decoration: none;                  /* Phase 3 */
 }
 
 .page_heading h1 {
     font-size: 150%;
     margin-top: 3rem;                       /* Phase 4*/
-    margin-bottom: 0;                       /* */
+    margin-bottom: 0;                       
     border-bottom: 1px solid lightgray;   /* Phase 4*/
 }
 
@@ -113,7 +113,7 @@ header a:hover {
 main {
     margin: 0rem 1rem;
     width: 100%;
-    max-width: 50rem;
+    max-width: 50rem;                                       /* Phase 5*/
 }
 
 .page_heading {
@@ -136,7 +136,7 @@ header div {
     flex-direction: row;                    /* Phase 5 */
     justify-content: left ;                 /* Phase 5 */
     width: 100%;
-    max-width: 50rem;
+    max-width: 50rem;                       /* Phase 5*/
 }
 
 
