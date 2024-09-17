@@ -3,7 +3,11 @@ from django.contrib.auth.models import User, Group
 
 # Create your models here.
 class Assignment(models.Model):
-    field = models.Field
+    title = models.CharField(max_length=200)
+    description = models.TextField()
+    deadline = models.DateTimeField()
+    weight = models.IntegerField()
+    points = models.IntegerField()
 
 class Submission(models.Model):
     print()
