@@ -10,4 +10,5 @@ class Assignment(models.Model):
     points = models.IntegerField()
 
 class Submission(models.Model):
-    print()
+    assignment = models.CharField(max_length=200)
+    
