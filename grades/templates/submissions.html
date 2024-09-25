@@ -16,8 +16,8 @@
 
 <main>
     <section class="page_heading">
-        <h1>Homework 1 (HTML)</h1>
-        <p>All grades out of 100</p>
+        <h1>{{ assignment.title }}</h1>
+        <p>All grades out of {{ assignment.points }}</p>
     </section>
 
     <form>
@@ -30,22 +30,19 @@
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <td><label for="s1">s1</label></td>
-                    <td><a href="#">Submission</a></td>
-                    <td><input type="number" id="s1"></td>
-                </tr>
-                <tr>
-                    <td><label for="s2">s2</label></td>
-                    <td><a href="#">Submission</a></td>
-                    <td><input type="number" id="s2"></td>
-                </tr>
+                {% for submission in submissions %}
+                    <tr>
+                        <td><label for="{{submission.author}}"> {{submission.author}} </label></td>
+                        <td><a href="#">Submission</a></td>
+                        <td><input type="number" id="{{submission.author}}" value="{{submission.score}}"></td>
+                    </tr>
+                {% endfor %}
             </tbody>
         </table>
     
         <div>
             <input type="submit">
-            <a href="assignment.html">Back to assignment</a>
+            <a href="/{{ assignment.id }}/">Back to assignment</a>
         </div>
         
     </form>
