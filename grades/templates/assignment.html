@@ -16,36 +16,21 @@
 
 <main>
     <section class="page_heading">
-        <h1>Homework 1 (HTML)</h1>
-        <p>Due September 08, total of 100 points</p>
+        <h1>{{ assignment.title }}</h1>
+        <p>Due {{ assignment.deadline|date:"F d" }}, total of {{ assignment.points }} points</p>
     </section>
 
     <aside class="action_card">
         <div>
-            <p>Currently 2/3 submisions</p>
+            <p>Currently {{ number_of_submissions }}/{{ number_of_students }} submissions</p>
         </div>
         
         <div>
-            <p>One submission assigned to you</p>
-            <a href="submissions.html">Grade</a>
+            <p>{{ number_of_submissions_assigned_to_you }} submission{{ number_of_submissions_assigned_to_you|pluralize }} assigned to you</p>
+            <a href="/{{ assignment.id }}/submissions">Grade</a>
         </div>
     </aside>
     
     <h2 id="assignment_description_header">Description</h2>
-    <p>
-        In this assignment, you will set up a web server serving HTML web pages for
-        the grading application:
-    </p>
-    <ul>
-        <li>Configure and start a <em>basic web server</em> using Django</li>
-        <li>Create <em>basic web pages</em> using HTML for data/content</li>
-    </ul>
-    <p>
-        For example, here is a page <strong>you will make,</strong> in a file called <code>assignments.html</code>:
-    </p>
-    <img src="../static/assignment.png" 
-    alt="Image of the assignment page for Homework 1 formatted using 
-    HTML and CSS. It is due on September 8th and is worth 100 points. 
-    The content in the picture is the same as the content in 
-    assignment.html (this file).">
+    {{ assignment.description|safe }}
 </main>
