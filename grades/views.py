@@ -19,7 +19,7 @@ def assignment(request, assignment_id):
         "number_of_submissions_assigned_to_you" : models.User.objects.get(username="g").graded_set.filter(assignment = assignment).count(),
         })
     except models.Assignment.DoesNotExist:
-        raise Http404("Hello")
+        raise Http404("Assignment not found")
 
 
 def submissions(request, assignment_id):
@@ -32,8 +32,8 @@ def submissions(request, assignment_id):
         "assignment" : assignment,
         "submissions" : submissions,
         })
-    except models.Assignment.DoesNotExist:
-        raise Http404("Hello")
+    except models.Submission.DoesNotExist:
+        raise Http404("Submission not found")
     
 
 
