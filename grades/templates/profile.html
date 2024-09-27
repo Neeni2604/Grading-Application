@@ -34,10 +34,10 @@
             </tr>
         </thead>
         <tbody>
-            {% for assignment in assignments %}
+            {% for graded_assignment in assignment_graded_column %}
                 <tr>
-                    <td><a href="/{{ assignment.id }}/">{{assignment.title}}</a></td>
-                    <td class="number_column">  / </td>
+                    <td><a href="/{{ graded_assignment.assignment.id }}/">{{ graded_assignment.assignment.title }}</a></td>
+                    <td class="number_column"> {{graded_assignment.submissions_you_graded}} / {{graded_assignment.submissions_assigned_to_you}} </td>
                 </tr>
             {% endfor %}            
         </tbody>

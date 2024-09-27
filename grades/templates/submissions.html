@@ -1,18 +1,10 @@
-<!doctype html>
+<!-- <!doctype html>
 <meta charset="utf-8">
 <link rel=icon href="/static/favicon.ico"/>
-<link rel="stylesheet" href="/static/main.css">
-<title>Submissions</title>
+<link rel="stylesheet" href="/static/main.css"> -->
+<!-- <title>Submissions</title> -->
 
-<header>
-    <div>
-        <h1>CS 3550</h1>
-        <ul>
-            <li><a href="index.html">Assignments</a></li>
-            <li><a href="profile.html">Profile</a></li>
-        </ul>
-    </div>
-</header>
+{% include "header.html" with title="Submissions" %}
 
 <main>
     <section class="page_heading">
@@ -32,9 +24,9 @@
             <tbody>
                 {% for submission in submissions %}
                     <tr>
-                        <td><label for="{{submission.author}}"> {{submission.author}} </label></td>
-                        <td><a href="#">Submission</a></td>
-                        <td><input type="number" id="{{submission.author}}" value="{{submission.score}}"></td>
+                        <td><label for="{{submission.author.get_full_name}}"> {{submission.author.get_full_name}} </label></td>
+                        <td><a href="{{ submission.file.url }}">Submission</a></td>
+                        <td><input type="number" id="{{submission.author.get_full_name}}" value="{{submission.score}}"></td>
                     </tr>
                 {% endfor %}
             </tbody>
