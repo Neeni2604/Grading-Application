@@ -6,7 +6,8 @@
         <p>All grades out of {{ assignment.points }}</p>
     </section>
 
-    <form>
+    <form action="/{{ assignment.id }}/submissions" method="post">
+        {% csrf_token %}
         <table>
             <thead>
                 <tr>

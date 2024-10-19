@@ -1,5 +1,6 @@
 from . import models
 from django.shortcuts import render
+from django.shortcuts import redirect
 from django.http import Http404
 
 # Create your views here.
@@ -23,6 +24,10 @@ def assignment(request, assignment_id):
 
 
 def submissions(request, assignment_id):
+    def grade(request, assignment_id):
+        if request.method == "POST":
+            return redirect(f"/{assignment_id}/submissions")
+    
     try:
         assignment = models.Assignment.objects.get(id=assignment_id)
         garry_grader = models.User.objects.get(username="g")
