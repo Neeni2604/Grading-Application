@@ -24,8 +24,10 @@ def assignment(request, assignment_id):
 
 
 def submissions(request, assignment_id):
-    def grade(request, assignment_id):
-            if request.method == "POST":
+    # def grade(request, assignment_id):
+    #         if request.method == "POST":
+    #             return redirect(f"/{assignment_id}/submissions")
+    if request.method == "POST":
                 return redirect(f"/{assignment_id}/submissions")
     
     assignment = models.Assignment.objects.get(id=assignment_id)
