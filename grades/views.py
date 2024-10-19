@@ -27,17 +27,26 @@ def submissions(request, assignment_id):
     def grade(request, assignment_id):
             if request.method == "POST":
                 return redirect(f"/{assignment_id}/submissions")
-    try:     
-        assignment = models.Assignment.objects.get(id=assignment_id)
-        garry_grader = models.User.objects.get(username="g")
-        submissions = assignment.submission_set.filter(grader=garry_grader).order_by("author")
+    
+    assignment = models.Assignment.objects.get(id=assignment_id)
+    garry_grader = models.User.objects.get(username="g")
+    submissions = assignment.submission_set.filter(grader=garry_grader).order_by("author")
 
-        return render(request, "submissions.html" , {
+    return render(request, "submissions.html" , {
         "assignment" : assignment,
         "submissions" : submissions,
         })
-    except models.Submission.DoesNotExist:
-        raise Http404("Submission not found")
+    # try:     
+    #     assignment = models.Assignment.objects.get(id=assignment_id)
+    #     garry_grader = models.User.objects.get(username="g")
+    #     submissions = assignment.submission_set.filter(grader=garry_grader).order_by("author")
+
+    #     return render(request, "submissions.html" , {
+    #     "assignment" : assignment,
+    #     "submissions" : submissions,
+    #     })
+    # except models.Submission.DoesNotExist:
+    #     raise Http404("Submission not found")
     
 
 
