@@ -1,6 +1,6 @@
 import datetime
 
-import os, django
+import os, django 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "cs3550.settings")
 django.setup()
 

@@ -3,7 +3,7 @@
 <main>
     <section class="page_heading">
         <h1>{{ assignment.title }}</h1>
-        <p>Due {{ assignment.deadline|date:"F d" }}, total of {{ assignment.points }} points</p>
+        <p>Due {{ assignment.deadline|date:"F d" }}, total of {{ assignment.points }} point{{ assignment.points|pluralize }}</p>
     </section>
 
     <aside class="action_card">
