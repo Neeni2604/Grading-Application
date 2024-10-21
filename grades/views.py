@@ -25,7 +25,19 @@ def assignment(request, assignment_id):
 
 def submissions(request, assignment_id):
     if request.method == "POST":
-                return redirect(f"/{assignment_id}/submissions")
+        submissions_updated = []
+        for key,value in request.POST.items():
+            if key.startswith("grade-"):
+                submission_id = int(key.removeprefix('grade-'))
+                submission = models.Submission.objects.get(id=submission_id)
+                if value:
+                    submission.score = float(value)
+                else:
+                    submission.score = None
+                submissions_updated.append(submission)
+
+        models.Submission.objects.bulk_update(submissions_updated, ['score'])
+        return redirect(f"/{assignment_id}/submissions")
     
     assignment = models.Assignment.objects.get(id=assignment_id)
     garry_grader = models.User.objects.get(username="g")

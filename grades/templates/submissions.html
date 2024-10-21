@@ -21,14 +21,15 @@
                     <tr>
                         <td><label for="{{submission.author.get_full_name}}"> {{submission.author.get_full_name}} </label></td>
                         <td><a href="{{ submission.file.url }}">Submission</a></td>
-                        <td><input type="number" id="{{submission.author.get_full_name}}" name="score_{{submission.id}}" value="{{submission.score}}"></td>
+                        <td><input type="number" id="{{submission.author.get_full_name}}" name="grade-{{assignment.id}}" value="{{submission.score}}"></td>
                     </tr>
                 {% endfor %}
             </tbody>
         </table>
     
         <div>
-            <input type="submit" value="Submit">
+            <!-- <input type="submit" value="Submit" name="grade-{{assignment.id}}"> -->
+            <button type="submit">Submit</button>
             <a href="/{{ assignment.id }}/">Back to assignment</a>
         </div>
         
