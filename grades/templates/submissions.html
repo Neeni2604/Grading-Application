@@ -35,7 +35,9 @@
                         <td>
                             {% for error in submission.errors %}
                                 <output class="invalidInputEntered">
-                                    {{ error }}
+                                    <p>
+                                        {{ error }}
+                                    </p>
                                 </output>
                             {% endfor %}
                         </td>

@@ -151,11 +151,21 @@ header div {
 
 
 /* -------------------------- Homework 4 -------------------------- */
-output.invalidInputEntered {
+output {
     font-weight: bold;
     color: red;
 }
 
+output p {
+    font-weight: bold;
+    color: red;
+    margin: 0;
+}
+
 input:invalid{
+    border-color: red;
+}
+
+input:invalid:focus{
     border-color: red;
 }
