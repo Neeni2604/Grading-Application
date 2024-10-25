@@ -1,10 +1,27 @@
-{% include "header.html" with title="{{assignment.title}}" %}
+{% include "header.html" with title=assignment.title %}
 
 <main>
     <section class="page_heading">
         <h1>{{ assignment.title }}</h1>
         <p>Due {{ assignment.deadline|date:"F d" }}, total of {{ assignment.points }} point{{ assignment.points|pluralize }}</p>
     </section>
+
+    <!-- Action card for Homework 4 -->
+    <aside class="action_card">
+        <p>
+            {% if aliceSubmission %}
+                <p>Current submission: <a href="{{aliceSubmission.file.url}}">{{ aliceSubmission.file.name }}</a> </p>
+            {% else %}
+                <p>No current submission</p>
+            {% endif %}
+        </p>
+        
+        <form action="/{{ assignment.id }}/" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <input type="file" name="subFile">
+            <input type="submit" value="Submit">
+        </form>
+    </aside>
 
     <aside class="action_card">
         <div>

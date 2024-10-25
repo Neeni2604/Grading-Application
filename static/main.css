@@ -148,3 +148,14 @@ header div {
 .action_card p {
     margin: 0px;
 }
+
+
+/* -------------------------- Homework 4 -------------------------- */
+output.invalidInputEntered {
+    font-weight: bold;
+    color: red;
+}
+
+input:invalid{
+    border-color: red;
+}

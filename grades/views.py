@@ -1,7 +1,7 @@
 from . import models
 from django.shortcuts import render
 from django.shortcuts import redirect
-from django.http import Http404
+from django.http import Http404, HttpResponse
 
 # Create your views here.
 def index(request):
@@ -13,40 +13,96 @@ def index(request):
 def assignment(request, assignment_id):
     try:
         assignment = models.Assignment.objects.get(id=assignment_id)
+        alice_algorithm = models.User.objects.get(username="a") 
+        aliceSubmission = assignment.submission_set.filter(author=alice_algorithm).first()
+
+        if request.method == "POST":
+            submittedFile = request.FILES.get('subFile')
+
+            if submittedFile:
+                if aliceSubmission:
+                    aliceSubmission.file = submittedFile
+                else:
+                        aliceSubmission = models.Submission.objects.create(
+                        assignment=assignment,
+                        author=alice_algorithm,
+                        grader=models.User.objects.get(username="g"),  
+                        file=submittedFile,
+                        score=None  
+                    )
+                aliceSubmission.save()
+            return redirect(f"/{assignment_id}/")
+
         return render(request, "assignment.html" , {
         "assignment" : assignment,
         "number_of_students" : models.Group.objects.get(name="Students").user_set.count(),
         "number_of_submissions" : assignment.submission_set.count(),
         "number_of_submissions_assigned_to_you" : models.User.objects.get(username="g").graded_set.filter(assignment = assignment).count(),
+        "alice_algorithm" : alice_algorithm,
+        "aliceSubmission" : aliceSubmission,
         })
     except models.Assignment.DoesNotExist:
         raise Http404("Assignment not found")
+    except models.User.DoesNotExist:
+        raise Http404("User not found")
 
 
 def submissions(request, assignment_id):
-    if request.method == "POST":
-        submissions_updated = []
-        for key,value in request.POST.items():
-            if key.startswith("grade-"):
-                submission_id = int(key.removeprefix('grade-'))
-                submission = models.Submission.objects.get(id=submission_id)
-                if value:
-                    submission.score = float(value)
-                else:
-                    submission.score = None
-                submissions_updated.append(submission)
-
-        models.Submission.objects.bulk_update(submissions_updated, ['score'])
-        return redirect(f"/{assignment_id}/submissions")
-    
     assignment = models.Assignment.objects.get(id=assignment_id)
     garry_grader = models.User.objects.get(username="g")
     submissions = assignment.submission_set.filter(grader=garry_grader).order_by("author")
+    errors = {}
+    invalidSubs = []
 
-    return render(request, "submissions.html" , {
-        "assignment" : assignment,
-        "submissions" : submissions,
-        })
+    if request.method == "POST":
+        valid_submissions = []
+        
+        for key, value in request.POST.items():
+            if key.startswith("grade-"):
+                try:
+                    submission_id = int(key.removeprefix('grade-'))
+                    submission = models.Submission.objects.get(id=submission_id, assignment=assignment)
+                    
+                    # If value is empty, set score as None
+                    if value == '':
+                        submission.score = None
+                    else:
+                        if float(value) < 0 or float(value) > assignment.points:
+                            raise ValueError(f"Grade must be between 0 and {assignment.points}.")
+                        submission.score = float(value)
+                        
+                    valid_submissions.append(submission)
+                except ValueError as ve:
+                    errors[submission_id] = [str(ve)]
+                except models.Submission.DoesNotExist:
+                    print("correct exception")
+                    invalidSubs.append(submission_id)
+                    errors[submission_id] = ["Submission does not exist."]
+        
+        
+        if valid_submissions:
+            models.Submission.objects.bulk_update(valid_submissions, ['score'])
+        
+        # Rerendering template
+        if not errors:
+            return redirect(f"/{assignment_id}/submissions")
+        
+    submissionsArray = []
+
+    for sub in submissions:
+        dict = {}
+        dict["id"] = sub.id
+        dict["name"] = sub.author.get_full_name()
+        dict["sub"] = sub.file.url
+        dict["score"] = sub.score
+        dict["errors"] = errors.get(sub.id, [])
+        submissionsArray.append(dict)
+
+    return render(request, "submissions.html", {
+        "assignment": assignment,
+        "submissionsArray" : submissionsArray,
+        "invalidSubs" : invalidSubs,
+    })
 
 
 def profile(request):
@@ -67,3 +123,7 @@ def profile(request):
 
 def login_form(request):
     return render(request, "login.html")
+
+def show_upload(request, filename):
+    submission = models.Submission.objects.get(file=filename)
+    return HttpResponse(submission.file.open())

@@ -1,0 +1,15 @@
+{% include "title.html" with title="Example page" %}
+<style>
+tr.odd { background-color: lightgray; }
+</style>
+Hello {{students|length}}
+student{{students|pluralize}}:
+<table>
+{% for student in students|dictsort:"name" %}
+<tr class={% cycle "even" "odd" %}><td>
+  {{student}}
+</td></tr>
+{% endfor %}
+</table>
+but especially {{main_student}}!
+Also {{favorite_student|default:"everyone"}} is my favorite student!

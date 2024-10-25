@@ -8,28 +8,44 @@
 
     <form action="/{{ assignment.id }}/submissions" method="post">
         {% csrf_token %}
+
+        {% if invalidSubs %}
+            {% for invalidSub in invalidSubs %}
+            <output>
+                <p>Submission with ID {{ invalidSub }} does not exist.</p>
+            </output>
+            {% endfor %}
+        {% endif %}
+
         <table>
             <thead>
                 <tr>
                     <th><strong>Student</strong></th>
                     <th><strong>Submission</strong></th>
                     <th><strong>Grade</strong></th>
+                    <th></th>
                 </tr>
             </thead>
             <tbody>
-                {% for submission in submissions %}
+                {% for submission in submissionsArray %}
                     <tr>
-                        <td><label for="{{submission.author.get_full_name}}"> {{submission.author.get_full_name}} </label></td>
-                        <td><a href="{{ submission.file.url }}">Submission</a></td>
-                        <td><input type="number" id="{{submission.author.get_full_name}}" name="grade-{{assignment.id}}" value="{{submission.score}}"></td>
+                        <td><label for="{{submission.name}}"> {{submission.name}} </label></td>
+                        <td><a href="{{ submission.sub }}">Submission</a></td>
+                        <td><input type="number" id="{{submission.name}}" name="grade-{{submission.id}}" value="{{submission.score}}" min="0" max="{{ assignment.points }}"></td>
+                        <td>
+                            {% for error in submission.errors %}
+                                <output class="invalidInputEntered">
+                                    {{ error }}
+                                </output>
+                            {% endfor %}
+                        </td>
                     </tr>
                 {% endfor %}
             </tbody>
         </table>
     
         <div>
-            <!-- <input type="submit" value="Submit" name="grade-{{assignment.id}}"> -->
-            <button type="submit">Submit</button>
+            <input type="submit" value="Submit">
             <a href="/{{ assignment.id }}/">Back to assignment</a>
         </div>
         
