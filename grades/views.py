@@ -63,7 +63,6 @@ def submissions(request, assignment_id):
                     submission_id = int(key.removeprefix('grade-'))
                     submission = models.Submission.objects.get(id=submission_id, assignment=assignment)
                     
-                    # If value is empty, set score as None
                     if value == '':
                         submission.score = None
                     else:
@@ -75,15 +74,12 @@ def submissions(request, assignment_id):
                 except ValueError as ve:
                     errors[submission_id] = [str(ve)]
                 except models.Submission.DoesNotExist:
-                    print("correct exception")
                     invalidSubs.append(submission_id)
                     errors[submission_id] = ["Submission does not exist."]
-        
-        
+
         if valid_submissions:
             models.Submission.objects.bulk_update(valid_submissions, ['score'])
         
-        # Rerendering template
         if not errors:
             return redirect(f"/{assignment_id}/submissions")
         
