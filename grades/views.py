@@ -130,7 +130,7 @@ def login_form(request):
             login(request, user)
             return redirect("/profile/")
         else:
-            return render(request, 'login.html')
+            return render(request, "login.html")
     return render(request, "login.html")
 
 def show_upload(request, filename):
