@@ -128,6 +128,7 @@ def login_form(request):
 
         if user is not None:
             login(request, user)
+            return redirect("/profile/")
         else:
             return render(request, 'login.html', {'error': 'Invalid username or password'})
     return render(request, "login.html")
