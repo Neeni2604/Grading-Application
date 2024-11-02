@@ -4,7 +4,6 @@ from django.shortcuts import redirect
 from django.http import Http404, HttpResponse
 from django.contrib.auth import authenticate, login, logout
 
-# Create your views here.
 def index(request):
     return render(request, "index.html" , {
         "assignments" : models.Assignment.objects.all(),
@@ -121,8 +120,8 @@ def profile(request):
 
 def login_form(request):
     if request.method=="POST":
-        u = request.POST.get("u", "")
-        p = request.POST.get("p", "")            
+        u = request.POST.get("username", "")
+        p = request.POST.get("password", "")            
 
         user = authenticate(username=u, password=p)
 
