@@ -120,16 +120,16 @@ def profile(request):
 
 
 def login_form(request):
-    if request.method==POST:
-            username = request.POST.get("username", "")
-            password = request.POST.get("password", "")            
+    if request.method=="POST":
+        username = request.POST.get("username", "")
+        password = request.POST.get("password", "")            
 
-            user = authenticate(username=username, password=password)
+        user = authenticate(username=username, password=password)
 
-            if user is not None:
-                login(request, user)
-            else:
-                 return render(request, 'login.html', {'error': 'Invalid username or password'})
+        if user is not None:
+            login(request, user)
+        else:
+            return render(request, 'login.html', {'error': 'Invalid username or password'})
     return render(request, "login.html")
 
 def show_upload(request, filename):
