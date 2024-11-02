@@ -132,14 +132,10 @@ def login_form(request):
                  return render(request, 'login.html', {'error': 'Invalid username or password'})
     return render(request, "login.html")
 
-def logout_form(request):
-    logout(request)
-
-    
-
-
-    
-
 def show_upload(request, filename):
     submission = models.Submission.objects.get(file=filename)
     return HttpResponse(submission.file.open())
+
+def logout_form(request):
+    logout(request)
+    return redirect(f"/profile/login/")
