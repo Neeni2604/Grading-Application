@@ -121,10 +121,10 @@ def profile(request):
 
 def login_form(request):
     if request.method=="POST":
-        username = request.POST.get("username", "")
-        password = request.POST.get("password", "")            
+        u = request.POST.get("u", "")
+        p = request.POST.get("p", "")            
 
-        user = authenticate(username=username, password=password)
+        user = authenticate(username=u, password=p)
 
         if user is not None:
             login(request, user)
