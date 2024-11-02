@@ -138,4 +138,4 @@ def show_upload(request, filename):
 
 def logout_form(request):
     logout(request)
-    return redirect(f"/profile/login/")
+    return redirect("/profile/login/")
