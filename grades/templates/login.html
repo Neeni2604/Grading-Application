@@ -5,19 +5,20 @@
         <h1>Log in</h1>
     </section>
     
-    <form id="login_form">
+    <form id="login_form" action="/profile/login/" method="post">
+        {% csrf_token %}
         <div class="login_form_input">
             <label for="username">Username</label>
-            <input type="text" id="username" autofocus>
+            <input type="text" id="username" name="username" autofocus>
         </div>
 
         <div class="login_form_input">
             <label for="password">Password</label>
-            <input type="password" id="password">
+            <input type="password" id="password" name="password">
         </div>
         
         <div id="login_form_submit_button">
-            <input type="submit" value="Login">
+            <input type="submit" value="Login" name="login">
         </div>
     </form>
 </main>

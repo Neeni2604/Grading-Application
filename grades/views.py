@@ -2,6 +2,7 @@ from . import models
 from django.shortcuts import render
 from django.shortcuts import redirect
 from django.http import Http404, HttpResponse
+from django.contrib.auth import authenticate, login, logout
 
 # Create your views here.
 def index(request):
@@ -114,11 +115,30 @@ def profile(request):
 
     return render(request, "profile.html", {
         "assignment_graded_column": assignment_graded_column,
+        "user": request.user,
     })
 
 
 def login_form(request):
+    if request.method==POST:
+            username = request.POST.get("username", "")
+            password = request.POST.get("password", "")            
+
+            user = authenticate(username=username, password=password)
+
+            if user is not None:
+                login(request, user)
+            else:
+                 return render(request, 'login.html', {'error': 'Invalid username or password'})
     return render(request, "login.html")
+
+def logout_form(request):
+    logout(request)
+
+    
+
+
+    
 
 def show_upload(request, filename):
     submission = models.Submission.objects.get(file=filename)
