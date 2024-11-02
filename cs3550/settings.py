@@ -126,3 +126,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 MEDIA_ROOT = "uploads/"
 MEDIA_URL = "uploads/"
+
+CSRF_COOKIE_SECURE = False
+SESSION_COOKIE_SECURE = False
