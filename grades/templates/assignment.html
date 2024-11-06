@@ -8,30 +8,31 @@
 
     <!-- Action card for Homework 4 -->
     <aside class="action_card">
-        <p>
-            {% if aliceSubmission %}
-                <p>Current submission: <a href="{{aliceSubmission.file.url}}">{{ aliceSubmission.file.name }}</a> </p>
-            {% else %}
-                <p>No current submission</p>
-            {% endif %}
-        </p>
+        {% if is_student %}
+            <p>
+                {% if currentUserSubmission %}
+                    <p>Current submission: <a href="{{currentUserSubmission.file.url}}">{{ currentUserSubmission.file.name }}</a> </p>
+                {% else %}
+                    <p>No current submission</p>
+                {% endif %}
+            </p>
+            
+            <form action="/{{ assignment.id }}/" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <input type="file" name="subFile">
+                <input type="submit" value="Submit">
+            </form>
+        {% elif is_ta %}
+            <div>
+                <p>Currently {{ number_of_submissions }}/{{ number_of_students }} submissions</p>
+            </div>
+            
+            <div>
+                <p>{{ number_of_submissions_assigned_to_you }} submission{{ number_of_submissions_assigned_to_you|pluralize }} assigned to you</p>
+                <a href="/{{ assignment.id }}/submissions">Grade</a>
+            </div>
+        {% endif %}
         
-        <form action="/{{ assignment.id }}/" method="post" enctype="multipart/form-data">
-            {% csrf_token %}
-            <input type="file" name="subFile">
-            <input type="submit" value="Submit">
-        </form>
-    </aside>
-
-    <aside class="action_card">
-        <div>
-            <p>Currently {{ number_of_submissions }}/{{ number_of_students }} submissions</p>
-        </div>
-        
-        <div>
-            <p>{{ number_of_submissions_assigned_to_you }} submission{{ number_of_submissions_assigned_to_you|pluralize }} assigned to you</p>
-            <a href="/{{ assignment.id }}/submissions">Grade</a>
-        </div>
     </aside>
     
     <h2 id="assignment_description_header">Description</h2>

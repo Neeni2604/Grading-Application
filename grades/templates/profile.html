@@ -11,8 +11,8 @@
             <a href="/profile/logout" role="button">Log Out</a>
         </div>
     </aside>
-    
-    <table>
+
+    <!-- <table>
         <thead>
             <tr>
                 <th>Assignment</th>
@@ -27,5 +27,64 @@
                 </tr>
             {% endfor %}            
         </tbody>
-    </table>
+    </table> -->
+    
+    {% if is_student %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Assignment</th>
+                    <th class="number_column">Score</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for assignment in assignment_graded_column %}
+                    <tr>
+                        <td><a href="/{{ assignment.assignment.id }}/">{{ assignment.assignment.title }}</a></td>
+                        <td class="number_column"> {{assignment.status}} </td>
+                    </tr>
+                {% endfor %}            
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td>Final Grade</td>
+                    <td>{{ finalGrade }}</td>
+                </tr>
+            </tfoot>
+        </table>
+    {% elif is_ta %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Assignment</th>
+                    <th class="number_column">Graded</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for graded_assignment in assignment_graded_column %}
+                    <tr>
+                        <td><a href="/{{ graded_assignment.assignment.id }}/">{{ graded_assignment.assignment.title }}</a></td>
+                        <td class="number_column"> {{graded_assignment.submissions_you_graded}} / {{graded_assignment.submissions_assigned_to_you}} </td>
+                    </tr>
+                {% endfor %}            
+            </tbody>
+        </table>
+    {% elif is_superuser %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Assignment</th>
+                    <th class="number_column">Graded</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for graded_assignment in assignment_graded_column %}
+                    <tr>
+                        <td><a href="/{{ graded_assignment.assignment.id }}/">{{ graded_assignment.assignment.title }}</a></td>
+                        <td class="number_column"> {{graded_assignment.gradedSubs}} / {{graded_assignment.totalSubs}} </td>
+                    </tr>
+                {% endfor %}            
+            </tbody>
+        </table>
+    {% endif %}
 </main>

@@ -3,6 +3,7 @@ from django.shortcuts import render
 from django.shortcuts import redirect
 from django.http import Http404, HttpResponse
 from django.contrib.auth import authenticate, login, logout
+from datetime import datetime, timezone
 
 def index(request):
     return render(request, "index.html" , {
@@ -13,33 +14,35 @@ def index(request):
 def assignment(request, assignment_id):
     try:
         assignment = models.Assignment.objects.get(id=assignment_id)
-        alice_algorithm = models.User.objects.get(username="a") 
-        aliceSubmission = assignment.submission_set.filter(author=alice_algorithm).first()
+        currentUser = request.user
+        currentUserSubmission = assignment.submission_set.filter(author=currentUser).first()
 
         if request.method == "POST":
             submittedFile = request.FILES.get('subFile')
 
             if submittedFile:
-                if aliceSubmission:
-                    aliceSubmission.file = submittedFile
+                if currentUserSubmission:
+                    currentUserSubmission.file = submittedFile
                 else:
-                        aliceSubmission = models.Submission.objects.create(
+                        currentUserSubmission = models.Submission.objects.create(
                         assignment=assignment,
-                        author=alice_algorithm,
-                        grader=models.User.objects.get(username="g"),  
+                        author=currentUser,
+                        grader=None,    #replace with pick_grader
                         file=submittedFile,
                         score=None  
                     )
-                aliceSubmission.save()
+                currentUserSubmission.save()
             return redirect(f"/{assignment_id}/")
 
         return render(request, "assignment.html" , {
         "assignment" : assignment,
         "number_of_students" : models.Group.objects.get(name="Students").user_set.count(),
         "number_of_submissions" : assignment.submission_set.count(),
-        "number_of_submissions_assigned_to_you" : models.User.objects.get(username="g").graded_set.filter(assignment = assignment).count(),
-        "alice_algorithm" : alice_algorithm,
-        "aliceSubmission" : aliceSubmission,
+        "number_of_submissions_assigned_to_you" : assignment.submission_set.filter(grader=currentUser).count(),
+        "currentUser" : currentUser,
+        "is_ta": is_ta(currentUser),
+        "is_student": is_student(currentUser),
+        "currentUserSubmission" : currentUserSubmission,
         })
     except models.Assignment.DoesNotExist:
         raise Http404("Assignment not found")
@@ -49,8 +52,13 @@ def assignment(request, assignment_id):
 
 def submissions(request, assignment_id):
     assignment = models.Assignment.objects.get(id=assignment_id)
-    garry_grader = models.User.objects.get(username="g")
-    submissions = assignment.submission_set.filter(grader=garry_grader).order_by("author")
+    
+    user = request.user
+    if user.is_superuser:
+        submissions = assignment.submission_set.all()
+    else:
+        submissions = assignment.submission_set.filter(grader=user).order_by("author")
+        
     errors = {}
     invalidSubs = []
 
@@ -103,18 +111,54 @@ def submissions(request, assignment_id):
 
 def profile(request):
     assignments = models.Assignment.objects.all()
-    garry_grader = models.User.objects.get(username="g")
+    currentUser = request.user
 
     assignment_graded_column = []
 
-    for assignment in assignments:
-        submissions_assigned_to_you = assignment.submission_set.filter(grader=garry_grader).count()
-        submissions_you_graded = assignment.submission_set.filter(grader=garry_grader, score__isnull=False).count()
-        assignment_graded_column.append({"assignment":assignment, "submissions_you_graded":submissions_you_graded ,"submissions_assigned_to_you": submissions_assigned_to_you})
+    totalWeight = 0
+    currWeight = 0
+    finalGrade=0
 
+    if(currentUser.is_superuser):
+        for assignment in assignments:
+            totalSubs = assignment.submission_set.count()
+            gradedSubs = assignment.submission_set.filter(score__isnull=False).count()
+            assignment_graded_column.append({"assignment":assignment, "totalSubs":totalSubs, "gradedeSubs":gradedSubs})
+    
+    elif(is_ta(currentUser)):
+        for assignment in assignments:
+            submissions_assigned_to_you = assignment.submission_set.filter(grader=currentUser).count()
+            submissions_you_graded = assignment.submission_set.filter(grader=currentUser, score__isnull=False).count()
+            assignment_graded_column.append({"assignment":assignment, "submissions_you_graded":submissions_you_graded ,"submissions_assigned_to_you": submissions_assigned_to_you})
+    
+    # Student view
+    elif(is_student(currentUser)):
+        for assignment in assignments:
+            submissionForAssignment = assignment.submission_set.filter(author=currentUser).first()
+            if submissionForAssignment:
+                # calculate the grade
+                if submissionForAssignment.score is not None:
+                    assignmentGrade= calculateAssignmentGrade(assignment, submissionForAssignment)
+                    totalWeight += assignment.weight
+                    currWeight += assignment.weight * assignmentGrade
+                    assignment_graded_column.append({"assignment":assignment, "status":assignmentGrade})
+                else:
+                    assignment_graded_column.append({"assignment":assignment, "status":"Ungraded"})
+            else:
+                if assignment.deadline > datetime.now(timezone.utc):
+                    totalWeight += assignment.weight
+                    assignment_graded_column.append({"assignment":assignment, "status":"Missing"})
+                elif assignment.deadline <= datetime.now(timezone.utc):
+                    assignment_graded_column.append({"assignment":assignment, "status":"Not Due"})
+        
+        finalGrade = (totalWeight / currWeight) * 100
     return render(request, "profile.html", {
         "assignment_graded_column": assignment_graded_column,
-        "user": request.user,
+        "user": currentUser,
+        "finalGrade": finalGrade,
+        "is_student": is_student(currentUser),
+        "is_ta": is_student(currentUser),
+        "is_superuser": currentUser.is_superuser
     })
 
 
@@ -139,3 +183,16 @@ def show_upload(request, filename):
 def logout_form(request):
     logout(request)
     return redirect("/profile/login/")
+
+
+def is_student(user):
+    return user.groups.filter(name="Students").exists()
+
+def is_ta(user):
+    return user.groups.filter(name="Teaching Assistants").exists()
+
+def calculateAssignmentGrade(assignment, submissionForAssignment):
+    points = assignment.points
+    score = submissionForAssignment.score
+    return (score / points) * 100
+
