@@ -16,6 +16,12 @@
             <label for="password">Password</label>
             <input type="password" id="password" name="password">
         </div>
+
+        <input type="hidden" name="next" value="{{ next }}">
+
+        {% if error %}
+            <output>{{ error }}</output>
+        {% endif %}
         
         <div id="login_form_submit_button">
             <input type="submit" value="Login">

@@ -6,23 +6,41 @@
         <p>Due {{ assignment.deadline|date:"F d" }}, total of {{ assignment.points }} point{{ assignment.points|pluralize }}</p>
     </section>
 
+    {% if error %}
+        <output>
+            <p>{{ error }}</p>
+        </output>
+    {% endif %}
+
     <!-- Action card for Homework 4 -->
     <aside class="action_card">
         {% if is_student %}
             <p>
                 {% if currentUserSubmission %}
-                    <p>Current submission: <a href="{{currentUserSubmission.file.url}}">{{ currentUserSubmission.file.name }}</a> </p>
+                    {% if currentUserSubmission.score %}
+                        <p>Your submission, <a href="{{currentUserSubmission.file.url}}">{{ currentUserSubmission.file.name }}</a>, received {{ currentUserSubmission.score }} / {{ assignment.points }} points ({{ percent }}%)</p>
+                    {% else %}
+                        {% if past_deadline %}
+                            <p>Your submission, <a href="{{currentUserSubmission.file.url}}">{{ currentUserSubmission.file.name }}</a>, is being graded</p>
+                        {% else %}
+                            <p>Current submission: <a href="{{currentUserSubmission.file.url}}">{{ currentUserSubmission.file.name }}</a> </p>
+                        {% endif %}
+                    {% endif %}
                 {% else %}
+                    {% if past_deadline %}
+                        <p>You did not submit this assignment and received 0 points</p>
+                    {% else %}
                     <p>No current submission</p>
+                    {% endif %}
                 {% endif %}
             </p>
             
             <form action="/{{ assignment.id }}/" method="post" enctype="multipart/form-data">
                 {% csrf_token %}
-                <input type="file" name="subFile">
+                <input type="file" name="subFile" accept="application/pdf">
                 <input type="submit" value="Submit">
             </form>
-        {% elif is_ta %}
+        {% elif is_ta or is_superuser %}
             <div>
                 <p>Currently {{ number_of_submissions }}/{{ number_of_students }} submissions</p>
             </div>

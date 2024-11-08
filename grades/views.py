@@ -1,38 +1,73 @@
 from . import models
 from django.shortcuts import render
 from django.shortcuts import redirect
-from django.http import Http404, HttpResponse
+from django.http import Http404, HttpResponse, HttpResponseBadRequest
 from django.contrib.auth import authenticate, login, logout
 from datetime import datetime, timezone
+from django.contrib.auth.decorators import login_required
+from django.utils.http import url_has_allowed_host_and_scheme
+from django.core.exceptions import PermissionDenied
+from django.db.models import Count
 
+
+@login_required
 def index(request):
     return render(request, "index.html" , {
         "assignments" : models.Assignment.objects.all(),
     })
 
 
+@login_required
 def assignment(request, assignment_id):
     try:
         assignment = models.Assignment.objects.get(id=assignment_id)
         currentUser = request.user
         currentUserSubmission = assignment.submission_set.filter(author=currentUser).first()
 
+        percent=0
+
         if request.method == "POST":
             submittedFile = request.FILES.get('subFile')
 
+            if submittedFile.size > 64 * 1024 * 1024:
+                return render(request, "assignment.html", {
+                    "assignment": assignment,
+                    "currentUser": currentUser,
+                    "error": "File size exceeds 64 MiB limit.",
+                    "is_ta": is_ta(currentUser),
+                    "is_student": is_student(currentUser),
+                    "is_superuser":currentUser.is_superuser,
+                })
+            
+            if not (submittedFile.name.lower().endswith('.pdf') and next(submittedFile.chunks()).startswith(b'%PDF-')):
+                return render(request, "assignment.html", {
+                    "assignment": assignment,
+                    "currentUser": currentUser,
+                    "error": "Submission must be a valid PDF.",
+                    "is_ta": is_ta(currentUser),
+                    "is_student": is_student(currentUser),
+                    "is_superuser":currentUser.is_superuser,
+                })
+
             if submittedFile:
-                if currentUserSubmission:
-                    currentUserSubmission.file = submittedFile
+                if(assignment.deadline >= datetime.now(timezone.utc)):
+                    if currentUserSubmission:
+                        currentUserSubmission.file = submittedFile
+                    else:
+                            currentUserSubmission = models.Submission.objects.create(
+                            assignment=assignment,
+                            author=currentUser,
+                            grader=pick_grader(assignment),    # replace with pick_grader
+                            file=submittedFile,
+                            score=None  
+                        )
+                    currentUserSubmission.save()
                 else:
-                        currentUserSubmission = models.Submission.objects.create(
-                        assignment=assignment,
-                        author=currentUser,
-                        grader=None,    #replace with pick_grader
-                        file=submittedFile,
-                        score=None  
-                    )
-                currentUserSubmission.save()
+                    return HttpResponseBadRequest("Deadline for the assignment has passed")
             return redirect(f"/{assignment_id}/")
+        if currentUserSubmission:
+            if(currentUserSubmission.score and assignment.points):
+                percent = (currentUserSubmission.score/assignment.points)*100
 
         return render(request, "assignment.html" , {
         "assignment" : assignment,
@@ -42,7 +77,10 @@ def assignment(request, assignment_id):
         "currentUser" : currentUser,
         "is_ta": is_ta(currentUser),
         "is_student": is_student(currentUser),
+        "is_superuser":currentUser.is_superuser,
         "currentUserSubmission" : currentUserSubmission,
+        "past_deadline": assignment.deadline < datetime.now(timezone.utc),
+        "percent":percent,
         })
     except models.Assignment.DoesNotExist:
         raise Http404("Assignment not found")
@@ -50,7 +88,10 @@ def assignment(request, assignment_id):
         raise Http404("User not found")
 
 
+@login_required
 def submissions(request, assignment_id):
+    if not is_ta(request.user):
+        raise PermissionDenied("Only TAs can access the submissions page.")
     assignment = models.Assignment.objects.get(id=assignment_id)
     
     user = request.user
@@ -76,7 +117,7 @@ def submissions(request, assignment_id):
                     else:
                         if float(value) < 0 or float(value) > assignment.points:
                             raise ValueError(f"Grade must be between 0 and {assignment.points}.")
-                        submission.score = float(value)
+                        submission.change_grade(user, float(value))
                         
                     valid_submissions.append(submission)
                 except ValueError as ve:
@@ -109,6 +150,7 @@ def submissions(request, assignment_id):
     })
 
 
+@login_required
 def profile(request):
     assignments = models.Assignment.objects.all()
     currentUser = request.user
@@ -123,7 +165,7 @@ def profile(request):
         for assignment in assignments:
             totalSubs = assignment.submission_set.count()
             gradedSubs = assignment.submission_set.filter(score__isnull=False).count()
-            assignment_graded_column.append({"assignment":assignment, "totalSubs":totalSubs, "gradedeSubs":gradedSubs})
+            assignment_graded_column.append({"assignment":assignment, "totalSubs":totalSubs, "gradedSubs":gradedSubs})
     
     elif(is_ta(currentUser)):
         for assignment in assignments:
@@ -138,31 +180,32 @@ def profile(request):
             if submissionForAssignment:
                 # calculate the grade
                 if submissionForAssignment.score is not None:
-                    assignmentGrade= calculateAssignmentGrade(assignment, submissionForAssignment)
+                    assignmentGrade = calculateAssignmentGrade(assignment, submissionForAssignment)
                     totalWeight += assignment.weight
                     currWeight += assignment.weight * assignmentGrade
                     assignment_graded_column.append({"assignment":assignment, "status":assignmentGrade})
                 else:
                     assignment_graded_column.append({"assignment":assignment, "status":"Ungraded"})
             else:
-                if assignment.deadline > datetime.now(timezone.utc):
+                if assignment.deadline < datetime.now(timezone.utc):
                     totalWeight += assignment.weight
                     assignment_graded_column.append({"assignment":assignment, "status":"Missing"})
-                elif assignment.deadline <= datetime.now(timezone.utc):
+                elif assignment.deadline >= datetime.now(timezone.utc):
                     assignment_graded_column.append({"assignment":assignment, "status":"Not Due"})
         
-        finalGrade = (totalWeight / currWeight) * 100
+        finalGrade = (currWeight / totalWeight)
     return render(request, "profile.html", {
         "assignment_graded_column": assignment_graded_column,
         "user": currentUser,
         "finalGrade": finalGrade,
         "is_student": is_student(currentUser),
-        "is_ta": is_student(currentUser),
+        "is_ta": is_ta(currentUser),
         "is_superuser": currentUser.is_superuser
     })
 
 
 def login_form(request):
+    next = request.GET.get("next", "/profile/")
     if request.method=="POST":
         u = request.POST.get("username", "")
         p = request.POST.get("password", "")            
@@ -171,14 +214,28 @@ def login_form(request):
 
         if user is not None:
             login(request, user)
-            return redirect("/profile/")
+            next = request.POST.get("next", "/profile/")
+            if url_has_allowed_host_and_scheme(next, allowed_hosts=None):
+                return redirect(next)
+            return redirect("/")
         else:
-            return render(request, "login.html")
-    return render(request, "login.html")
+            return render(request, "login.html", {"error": "Username and password do not match", "next": next})
+    return render(request, "login.html", {"next": next},)
 
+@login_required
 def show_upload(request, filename):
-    submission = models.Submission.objects.get(file=filename)
-    return HttpResponse(submission.file.open())
+    try:
+        submission = models.Submission.objects.get(file=filename)
+        submission.view_submission(request.user)
+
+        if not is_pdf(submission.file):
+            raise Http404("File is not a valid PDF")
+        
+        response = HttpResponse(submission.file.open(), content_type="application/pdf")
+        response['Content-Disposition'] = f'attachment; filename="{filename}"'
+        return response
+    except models.Submission.DoesNotExist:
+        raise Http404("Submission not found")
 
 def logout_form(request):
     logout(request)
@@ -196,3 +253,16 @@ def calculateAssignmentGrade(assignment, submissionForAssignment):
     score = submissionForAssignment.score
     return (score / points) * 100
 
+def pick_grader(assignment):
+    group = models.Group.objects.get(name="Teaching Assistants")
+    ta = group.user_set.annotate(total_assigned=Count('graded_set')).order_by().first()
+    return ta
+
+def is_pdf(file):
+    if file.name.lower().endswith('.pdf'):
+        try:
+            return file.open('rb').read(5) == b'%PDF-'
+        except Exception:
+            return False
+    else:
+        return False
