@@ -7,7 +7,7 @@ from datetime import datetime, timezone
 from django.contrib.auth.decorators import login_required
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.core.exceptions import PermissionDenied
-from django.db.models import Count
+from django.db.models import Count, Q
 
 
 @login_required
@@ -68,15 +68,22 @@ def assignment(request, assignment_id):
         if currentUserSubmission:
             if(currentUserSubmission.score and assignment.points):
                 percent = (currentUserSubmission.score/assignment.points)*100
+                
+        number_of_submissions_assigned_to_you=0
+        if(is_ta(currentUser)):
+            number_of_submissions_assigned_to_you = assignment.submission_set.filter(grader=currentUser).count()
+        elif(currentUser.is_superuser):
+            number_of_submissions_assigned_to_you= assignment.submission_set.count()
 
         return render(request, "assignment.html" , {
         "assignment" : assignment,
         "number_of_students" : models.Group.objects.get(name="Students").user_set.count(),
         "number_of_submissions" : assignment.submission_set.count(),
-        "number_of_submissions_assigned_to_you" : assignment.submission_set.filter(grader=currentUser).count(),
+        "number_of_submissions_assigned_to_you" : number_of_submissions_assigned_to_you,
         "currentUser" : currentUser,
         "is_ta": is_ta(currentUser),
         "is_student": is_student(currentUser),
+        "is_anon": not currentUser.is_authenticated,
         "is_superuser":currentUser.is_superuser,
         "currentUserSubmission" : currentUserSubmission,
         "past_deadline": assignment.deadline < datetime.now(timezone.utc),
@@ -90,11 +97,11 @@ def assignment(request, assignment_id):
 
 @login_required
 def submissions(request, assignment_id):
-    if not is_ta(request.user):
+    user = request.user
+    if (not is_ta(user)) and (not user.is_superuser):
         raise PermissionDenied("Only TAs can access the submissions page.")
     assignment = models.Assignment.objects.get(id=assignment_id)
     
-    user = request.user
     if user.is_superuser:
         submissions = assignment.submission_set.all()
     else:
@@ -232,7 +239,7 @@ def show_upload(request, filename):
             raise Http404("File is not a valid PDF")
         
         response = HttpResponse(submission.file.open(), content_type="application/pdf")
-        response['Content-Disposition'] = f'attachment; filename="{filename}"'
+        # response['Content-Disposition'] = f'attachment; filename="{filename}"'
         return response
     except models.Submission.DoesNotExist:
         raise Http404("Submission not found")
@@ -255,7 +262,7 @@ def calculateAssignmentGrade(assignment, submissionForAssignment):
 
 def pick_grader(assignment):
     group = models.Group.objects.get(name="Teaching Assistants")
-    ta = group.user_set.annotate(total_assigned=Count('graded_set')).order_by().first()
+    ta = group.user_set.annotate(total_assigned=Count('graded_set', filter=Q(graded_set__assignment=assignment))).order_by('total_assigned').first()
     return ta
 
 def is_pdf(file):

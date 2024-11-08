@@ -14,7 +14,7 @@
 
     <!-- Action card for Homework 4 -->
     <aside class="action_card">
-        {% if is_student %}
+        {% if is_student or is_anon %}
             <p>
                 {% if currentUserSubmission %}
                     {% if currentUserSubmission.score %}
@@ -35,11 +35,13 @@
                 {% endif %}
             </p>
             
-            <form action="/{{ assignment.id }}/" method="post" enctype="multipart/form-data">
-                {% csrf_token %}
-                <input type="file" name="subFile" accept="application/pdf">
-                <input type="submit" value="Submit">
-            </form>
+            {% if not past_deadline %}
+                <form action="/{{ assignment.id }}/" method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <input type="file" name="subFile" accept="application/pdf">
+                    <input type="submit" value="Submit">
+                </form>
+            {% endif %}
         {% elif is_ta or is_superuser %}
             <div>
                 <p>Currently {{ number_of_submissions }}/{{ number_of_students }} submissions</p>
