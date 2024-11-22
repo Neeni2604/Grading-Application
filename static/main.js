@@ -184,7 +184,6 @@ function calculateGrade($table) {
 
             if(!isNaN(parseFloat($td.data("value"))))
             {
-                console.log($td.text());
                 score += parseFloat($td.data("value")) / 100; // Using the student's actual grade
             }
         }
