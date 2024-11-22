@@ -101,8 +101,6 @@ function make_form_async($form) {
 
 
 function make_grade_hypothesized($table) {
-    // const $button = $("<button>").text("Hypothesize").addClass("hypothesize");
-
     const $button = $('<button/>', {
                         text: 'Hypothesize',
                         class: 'hypothesize-button',
@@ -154,34 +152,45 @@ function calculateGrade($table) {
 
     $table.find("tbody tr").each(function () {
         const $td = $(this).find("td:last");
-        const weight = parseFloat($td.data("weight")) || 0;
+        // const weight = parseFloat($td.data("weight")) || 0;
+        let weight = 0;
         let score = 0;
 
         if ($table.hasClass("hypothesized")) {
             const $input = $td.find("input");
+
+            weight = parseFloat($td.data("weight"));
+
+            if(!isNaN(parseFloat($td.data("value"))))
+            {
+                score += parseFloat($td.data("value")) / 100; // Counting the graded assignments
+            }
             
             if ($input.length) {
                 const inputVal = parseFloat($input.val());
                 if (!isNaN(inputVal)) {
-                    score = inputVal / 100; // Convert percentage to decimal
+                    score = inputVal / 100; // Convert the % to decimal
                 } 
                 else {
-                    return; // Skip unfilled inputs
+                    return; // Skip
                 }
-            }
+            }   
         } 
         else{
-            console.log(parseFloat($td.data("value")));
+            if($td.data("value") === "Missing" || parseFloat($td.data("value")))
+            {
+                weight = parseFloat($td.data("weight"));
+            }
+
             if(!isNaN(parseFloat($td.data("value"))))
             {
-                score += parseFloat($td.data("value")) / 100; // Use actual grade
+                console.log($td.text());
+                score += parseFloat($td.data("value")) / 100; // Using the student's actual grade
             }
         }
 
-        if (score !== undefined) {
-            totalWeight += weight;
-            weightedScore += score * weight;
-        }
+        totalWeight += weight;
+        weightedScore += score * weight;
     });
 
     const finalGrade = totalWeight ? (weightedScore / totalWeight) * 100 : 0;

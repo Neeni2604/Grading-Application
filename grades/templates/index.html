@@ -15,7 +15,7 @@
         </thead>
         <tbody>
             {% for assignment in assignments %}
-                <tr>
+                <tr data-index="{{ forloop.counter }}">
                     <td><a href="/{{ assignment.id }}/">{{assignment.title}}</a></td>
                     <td data-value="{{ assignment.deadline|date:'U' }}">{{ assignment.deadline }}</td>
                     <td class="number_column" data-value="{{ assignment.weight }}">{{ assignment.weight }}</td>

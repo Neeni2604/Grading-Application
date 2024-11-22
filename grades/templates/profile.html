@@ -36,18 +36,18 @@
             </tfoot>
         </table>
     {% elif is_ta %}
-        <table>
+        <table class="sortable">
             <thead>
                 <tr>
                     <th>Assignment</th>
-                    <th class="number_column">Graded</th>
+                    <th class="sort-column number_column" role="button">Graded</th>
                 </tr>
             </thead>
             <tbody>
                 {% for graded_assignment in assignment_graded_column %}
-                    <tr>
+                    <tr data-index="{{ forloop.counter }}">
                         <td><a href="/{{ graded_assignment.assignment.id }}/">{{ graded_assignment.assignment.title }}</a></td>
-                        <td class="number_column"> {{graded_assignment.submissions_you_graded}} / {{graded_assignment.submissions_assigned_to_you}} </td>
+                        <td class="number_column" data-value="{{graded_assignment.submissions_you_graded}}"> {{graded_assignment.submissions_you_graded}} / {{graded_assignment.submissions_assigned_to_you}} </td>
                     </tr>
                 {% endfor %}            
             </tbody>
