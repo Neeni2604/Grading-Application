@@ -11,37 +11,20 @@
             <a href="/profile/logout" role="button">Log Out</a>
         </div>
     </aside>
-
-    <!-- <table>
-        <thead>
-            <tr>
-                <th>Assignment</th>
-                <th class="number_column">Graded</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for graded_assignment in assignment_graded_column %}
-                <tr>
-                    <td><a href="/{{ graded_assignment.assignment.id }}/">{{ graded_assignment.assignment.title }}</a></td>
-                    <td class="number_column"> {{graded_assignment.submissions_you_graded}} / {{graded_assignment.submissions_assigned_to_you}} </td>
-                </tr>
-            {% endfor %}            
-        </tbody>
-    </table> -->
     
     {% if is_student %}
-        <table>
+        <table class="sortable make_grade_hypothesized">
             <thead>
                 <tr>
                     <th>Assignment</th>
-                    <th class="number_column">Score</th>
+                    <th class="sort-column number_column" role=button>Score</th>
                 </tr>
             </thead>
             <tbody>
                 {% for assignment in assignment_graded_column %}
-                    <tr>
+                    <tr data-index="{{ forloop.counter }}">
                         <td><a href="/{{ assignment.assignment.id }}/">{{ assignment.assignment.title }}</a></td>
-                        <td class="number_column"> {{assignment.status}} </td>
+                        <td class="number_column" data-value="{{ assignment.status }}" data-weight="{{ assignment.assignment.weight }}"> {{assignment.status}} </td>
                     </tr>
                 {% endfor %}            
             </tbody>

@@ -5,20 +5,20 @@
         <h1>All Assignments</h1>
     </section>
     
-    <table>
+    <table class="sortable">
         <thead>
             <tr>
                 <th><strong>Assignment</strong></th>
-                <th><strong>Due Date</strong></th>
-                <th class="number_column"><strong>Weight</strong></th>
+                <th class="sort-column" role=button><strong>Due Date</strong></th>
+                <th class="sort-column number_column" role=button><strong>Weight</strong></th>
             </tr>  
         </thead>
         <tbody>
             {% for assignment in assignments %}
                 <tr>
                     <td><a href="/{{ assignment.id }}/">{{assignment.title}}</a></td>
-                    <td>{{ assignment.deadline }}</td>
-                    <td class="number_column">{{ assignment.weight }}</td>
+                    <td data-value="{{ assignment.deadline|date:'U' }}">{{ assignment.deadline }}</td>
+                    <td class="number_column" data-value="{{ assignment.weight }}">{{ assignment.weight }}</td>
                 </tr>
             {% endfor %}
         </tbody>

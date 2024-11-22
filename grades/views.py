@@ -239,7 +239,7 @@ def show_upload(request, filename):
             raise Http404("File is not a valid PDF")
         
         response = HttpResponse(submission.file.open(), content_type="application/pdf")
-        # response['Content-Disposition'] = f'attachment; filename="{filename}"'
+        response['Content-Disposition'] = f'attachment; filename="{filename}"'
         return response
     except models.Submission.DoesNotExist:
         raise Http404("Submission not found")
