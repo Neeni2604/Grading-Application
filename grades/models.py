@@ -25,6 +25,7 @@ class Submission(models.Model):
             raise PermissionDenied("You are not assigned to grade this submission.")
         else:
             self.score = newGrade
+            
 
     def view_submission(self, user):
         if user == self.author or user == self.grader or user.is_superuser:
